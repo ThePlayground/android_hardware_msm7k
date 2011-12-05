@@ -29,7 +29,7 @@ extern "C" {
 #include <linux/msm_audio.h>
 }
 
-namespace android {
+namespace android_audio_legacy {
 
 // ----------------------------------------------------------------------------
 // Kernel driver interface
@@ -180,6 +180,8 @@ private:
         virtual String8     getParameters(const String8& keys);
                 uint32_t    devices() { return mDevices; }
         virtual status_t    getRenderPosition(uint32_t *dspFrames);
+        virtual status_t    addAudioEffect(effect_handle_t effect){return INVALID_OPERATION;}
+        virtual status_t    removeAudioEffect(effect_handle_t effect){return INVALID_OPERATION;}
 
     private:
                 AudioHardware* mHardware;
@@ -219,6 +221,8 @@ private:
         virtual unsigned int  getInputFramesLost() const { return 0; }
                 uint32_t    devices() { return mDevices; }
                 int         state() const { return mState; }
+        virtual status_t    addAudioEffect(effect_handle_t effect){return INVALID_OPERATION;}
+        virtual status_t    removeAudioEffect(effect_handle_t effect){return INVALID_OPERATION;}
 
     private:
                 AudioHardware* mHardware;
@@ -239,14 +243,14 @@ private:
             bool        mBluetoothNrec;
             uint32_t    mBluetoothId;
             AudioStreamOutMSM72xx*  mOutput;
-            SortedVector <AudioStreamInMSM72xx*>   mInputs;
+            android::SortedVector <AudioStreamInMSM72xx*>   mInputs;
 
             msm_snd_endpoint *mSndEndpoints;
             int mNumSndEndpoints;
             int mCurSndDevice;
 
      friend class AudioStreamInMSM72xx;
-            Mutex       mLock;
+            android::Mutex       mLock;
 
             int SND_DEVICE_CURRENT;
             int SND_DEVICE_HANDSET;
