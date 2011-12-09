@@ -19,6 +19,8 @@ ifeq ($(BOARD_USES_QCOM_LIBRPC),true)
     LIBRPC := librpc-qcom
 endif
 
+ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
+
 common_msm_dirs := liblights $(LIBRPC) dspcrashd
 msm7k_dirs := $(common_msm_dirs) boot
 
@@ -26,6 +28,8 @@ ifeq ($(TARGET_BOARD_PLATFORM),msm7x27)
   include $(call all-named-subdir-makefiles,$(msm7k_dirs))
 else
   include $(call all-named-subdir-makefiles,$(common_msm_dirs))
+endif
+
 endif
 
 # common_msm_dirs := libcopybit liblights libopencorehw $(LIBRPC)
