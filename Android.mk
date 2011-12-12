@@ -22,22 +22,25 @@ endif
 ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
 
 common_msm_dirs := liblights $(LIBRPC)
-msm7k_dirs := $(common_msm_dirs) boot libaudio dspcrashd
 qsd8k_dirs := $(common_msm_dirs) libaudio-qsd8k dspcrashd
 msm7x30_dirs := $(common_msm_dirs) libaudio-msm7x30
+msm7x27a_dirs := $(common_msm_dirs) libaudio-msm7x27a
+msm7k_dirs := $(common_msm_dirs) boot libaudio dspcrashd
 
 ifeq ($(TARGET_BOARD_PLATFORM),msm7x30)
   include $(call all-named-subdir-makefiles,$(msm7x30_dirs))
-else
-  ifeq ($(TARGET_BOARD_PLATFORM),qsd8k)
-    include $(call all-named-subdir-makefiles,$(qsd8k_dirs))
-  else
-    ifeq ($(TARGET_BOARD_PLATFORM), msm7x27)
-      include $(call all-named-subdir-makefiles,$(msm7k_dirs))
-    else
-      include $(call all-named-subdir-makefiles,$(common_msm_dirs))
-    endif
-  endif
+endif
+
+ifeq ($(TARGET_BOARD_PLATFORM),qsd8k)
+  include $(call all-named-subdir-makefiles,$(qsd8k_dirs))
+endif
+
+ifeq ($(TARGET_BOARD_PLATFORM), msm7x27a)
+   include $(call all-named-subdir-makefiles,$(msm7x27a_dirs))
+endif
+
+ifeq ($(TARGET_BOARD_PLATFORM), msm7x27)
+  include $(call all-named-subdir-makefiles,$(msm7k_dirs))
 endif
 
 endif
