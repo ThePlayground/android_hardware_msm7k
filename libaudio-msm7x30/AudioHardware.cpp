@@ -64,9 +64,9 @@ extern "C" {
 #define QCELP_FRAME_SIZE 35
 #endif
 
-namespace android {
+using namespace android;
 
-using namespace android_audio_legacy;
+namespace android_audio_legacy {
 
 Mutex mDeviceSwitchLock;
 Mutex mAIC3254ConfigLock;
@@ -792,9 +792,9 @@ void AudioHardware::closeOutputStream(AudioStreamOut* out) {
 
 AudioStreamIn* AudioHardware::openInputStream(
         uint32_t devices, int *format, uint32_t *channels, uint32_t *sampleRate, status_t *status,
-        android_audio_legacy::AudioSystem::audio_in_acoustics acoustic_flags) {
+        AudioSystem::audio_in_acoustics acoustic_flags) {
     /* check for valid input source */
-    if (!android_audio_legacy::AudioSystem::isInputDevice((android_audio_legacy::AudioSystem::audio_devices)devices))
+    if (!AudioSystem::isInputDevice((AudioSystem::audio_devices)devices))
         return 0;
 
     mLock.lock();
@@ -836,8 +836,8 @@ status_t AudioHardware::setMode(int mode) {
     if (status == NO_ERROR) {
         /* make sure that doAudioRouteOrMute() is called by doRouting()
            even if the new device selected is the same as current one. */
-        if (((prevMode != android_audio_legacy::AudioSystem::MODE_IN_CALL) && (mMode == android_audio_legacy::AudioSystem::MODE_IN_CALL)) ||
-            ((prevMode == android_audio_legacy::AudioSystem::MODE_IN_CALL) && (mMode != android_audio_legacy::AudioSystem::MODE_IN_CALL))) {
+        if (((prevMode != AudioSystem::MODE_IN_CALL) && (mMode == AudioSystem::MODE_IN_CALL)) ||
+            ((prevMode == AudioSystem::MODE_IN_CALL) && (mMode != AudioSystem::MODE_IN_CALL))) {
              clearCurDevice();
         }
     }
@@ -863,7 +863,7 @@ status_t AudioHardware::setMicMute_nosync(bool state) {
         mMicMute = state;
         LOGD("setMicMute_nosync calling voice mute with the mMicMute %d", mMicMute);
 #ifdef WITH_QCOM_VOIPMUTE
-        if (isStreamOnAndActive(PCM_REC) && (mMode == android_audio_legacy::AudioSystem::MODE_IN_COMMUNICATION)) {
+        if (isStreamOnAndActive(PCM_REC) && (mMode == AudioSystem::MODE_IN_COMMUNICATION)) {
             vMicMute = state;
             LOGD("VOIP Active: vMicMute %d", vMicMute);
             msm_device_mute(DEV_ID(cur_tx), vMicMute);
@@ -884,7 +884,7 @@ status_t AudioHardware::getMicMute(bool* state) {
 }
 
 status_t AudioHardware::setParameters(const String8& keyValuePairs) {
-    AudioParameter param = AudioParameter(keyValuePairs);
+    android::AudioParameter param = android::AudioParameter(keyValuePairs);
     String8 value;
     String8 key;
     const char BT_NREC_KEY[] = "bt_headset_nrec";
@@ -965,7 +965,7 @@ status_t AudioHardware::setParameters(const String8& keyValuePairs) {
         else
             mTtyMode = TTY_OFF;
 
-        if (mMode != android_audio_legacy::AudioSystem::MODE_IN_CALL)
+        if (mMode != AudioSystem::MODE_IN_CALL)
            return NO_ERROR;
 
         LOGI("Changed TTY Mode = %s", value.string());
@@ -1005,7 +1005,7 @@ status_t AudioHardware::setParameters(const String8& keyValuePairs) {
 }
 
 String8 AudioHardware::getParameters(const String8& keys) {
-    AudioParameter param = AudioParameter(keys);
+    android::AudioParameter param = android::AudioParameter(keys);
     String8 value;
 
     String8 key = String8(DUALMIC_KEY);
@@ -1034,13 +1034,13 @@ String8 AudioHardware::getParameters(const String8& keys) {
 }
 
 size_t AudioHardware::getInputBufferSize(uint32_t sampleRate, int format, int channelCount) {
-    if ((format != android_audio_legacy::AudioSystem::PCM_16_BIT) &&
+    if ((format != AudioSystem::PCM_16_BIT) &&
 #ifdef WITH_QCOM_SPEECH
-        (format != android_audio_legacy::AudioSystem::AMR_NB) &&
-        (format != android_audio_legacy::AudioSystem::EVRC) &&
-        (format != android_audio_legacy::AudioSystem::QCELP) &&
+        (format != AudioSystem::AMR_NB) &&
+        (format != AudioSystem::EVRC) &&
+        (format != AudioSystem::QCELP) &&
 #endif 
-        (format != android_audio_legacy::AudioSystem::AAC)) {
+        (format != AudioSystem::AAC)) {
         LOGW("getInputBufferSize bad format: %d", format);
         return 0;
     }
@@ -1050,15 +1050,15 @@ size_t AudioHardware::getInputBufferSize(uint32_t sampleRate, int format, int ch
     }
 
 #ifdef WITH_QCOM_SPEECH
-    if (format == android_audio_legacy::AudioSystem::AMR_NB)
+    if (format == AudioSystem::AMR_NB)
        return 320*channelCount;
-    else if (format == android_audio_legacy::AudioSystem::EVRC)
+    else if (format == AudioSystem::EVRC)
        return 230*channelCount;
-    else if (format == android_audio_legacy::AudioSystem::QCELP)
+    else if (format == AudioSystem::QCELP)
        return 350*channelCount;
-    else if (format == android_audio_legacy::AudioSystem::AAC)
+    else if (format == AudioSystem::AAC)
 #else
-    if (format == android_audio_legacy::AudioSystem::AAC)
+    if (format == AudioSystem::AAC)
 #endif
        return 2048;
     else
@@ -1102,7 +1102,7 @@ status_t AudioHardware::setVoiceVolume(float v) {
     mVoiceVolume = vol;
     LOGV("msm_set_voice_rx_vol(%d) succeeded", vol);
 
-    if (mMode == android_audio_legacy::AudioSystem::MODE_IN_CALL &&
+    if (mMode == AudioSystem::MODE_IN_CALL &&
         mCurSndDevice != SND_DEVICE_BT &&
         mCurSndDevice != SND_DEVICE_CARKIT &&
         mCurSndDevice != SND_DEVICE_BT_EC_OFF &&
@@ -1153,7 +1153,7 @@ static status_t set_volume_fm(uint32_t volume) {
 }
 
 status_t AudioHardware::setFmVolume(float v) {
-    int vol = AudioSystem::logToLinear(v);
+    int vol = android::AudioSystem::logToLinear(v);
 
     if (vol > 100)
         vol = 100;
@@ -1454,7 +1454,7 @@ status_t AudioHardware::doAudioRouteOrMute(uint32_t device) {
     uint32_t tx_acdb_id = 0;
 
     if (!isHTCPhone)
-        return do_route_audio_rpc(device, mMode != android_audio_legacy::AudioSystem::MODE_IN_CALL,
+        return do_route_audio_rpc(device, mMode != AudioSystem::MODE_IN_CALL,
                                   mMicMute, rx_acdb_id, tx_acdb_id);
 
     if (device == SND_DEVICE_BT) {
@@ -1488,14 +1488,14 @@ status_t AudioHardware::doAudioRouteOrMute(uint32_t device) {
             tx_acdb_id = mBTEndpoints[1].tx;
             LOGD("Update ACDB ID to default carkit setting");
         }
-    } else if (mMode == android_audio_legacy::AudioSystem::MODE_IN_CALL
+    } else if (mMode == AudioSystem::MODE_IN_CALL
                && hac_enable && mHACSetting &&
                device == SND_DEVICE_HANDSET) {
         LOGD("Update acdb id to hac profile.");
         rx_acdb_id = ACDB_ID_HAC_HANDSET_SPKR;
         tx_acdb_id = ACDB_ID_HAC_HANDSET_MIC;
     } else {
-        if (mMode == android_audio_legacy::AudioSystem::MODE_IN_CALL) {
+        if (mMode == AudioSystem::MODE_IN_CALL) {
             rx_acdb_id = getACDB(MOD_RX, device);
             tx_acdb_id = getACDB(MOD_TX, device);
         } else {
@@ -1510,7 +1510,7 @@ status_t AudioHardware::doAudioRouteOrMute(uint32_t device) {
     LOGV("doAudioRouteOrMute: rx acdb %d, tx acdb %d", rx_acdb_id, tx_acdb_id);
     LOGV("doAudioRouteOrMute() device %d, mMode %d, mMicMute %d", device, mMode, mMicMute);
 
-    return do_route_audio_rpc(device, mMode != android_audio_legacy::AudioSystem::MODE_IN_CALL,
+    return do_route_audio_rpc(device, mMode != AudioSystem::MODE_IN_CALL,
                               mMicMute, rx_acdb_id, tx_acdb_id);
 }
 
@@ -1541,7 +1541,7 @@ uint32_t AudioHardware::getACDB(int mode, uint32_t device) {
     uint32_t acdb_id = 0;
     int batt_temp = 0;
 
-    if (mMode == android_audio_legacy::AudioSystem::MODE_IN_CALL &&
+    if (mMode == AudioSystem::MODE_IN_CALL &&
         device <= SND_DEVICE_NO_MIC_HEADSET) {
         if (mode == MOD_RX) {
             switch (device) {
@@ -1639,7 +1639,7 @@ status_t AudioHardware::do_aic3254_control(uint32_t device) {
 
     Mutex::Autolock lock(mAIC3254ConfigLock);
 
-    if (mMode == android_audio_legacy::AudioSystem::MODE_IN_CALL) {
+    if (mMode == AudioSystem::MODE_IN_CALL) {
         switch (device ) {
             case SND_DEVICE_HEADSET:
                 new_aic_rxmode = CALL_DOWNLINK_EMIC_HEADSET;
@@ -1778,7 +1778,7 @@ status_t AudioHardware::aic3254_config(uint32_t device) {
 
     Mutex::Autolock lock(mAIC3254ConfigLock);
 
-    if (mMode == android_audio_legacy::AudioSystem::MODE_IN_CALL) {
+    if (mMode == AudioSystem::MODE_IN_CALL) {
 #ifdef WITH_SPADE_DSP_PROFILE
         if (support_htc_backmic) {
             strcpy(name, "DualMic_Phone");
@@ -1927,21 +1927,21 @@ status_t AudioHardware::doRouting(AudioStreamInMSM72xx *input) {
         /* ignore routing device information when we start a recording in voice call
            Recording will happen through currently active tx device */
 #ifdef HAVE_FM_RADIO
-        if (inputDevice == android_audio_legacy::AudioSystem::DEVICE_IN_VOICE_CALL ||
-            inputDevice == android_audio_legacy::AudioSystem::DEVICE_IN_FM_RX ||
-            inputDevice == android_audio_legacy::AudioSystem::DEVICE_IN_FM_RX_A2DP)
+        if (inputDevice == AudioSystem::DEVICE_IN_VOICE_CALL ||
+            inputDevice == AudioSystem::DEVICE_IN_FM_RX ||
+            inputDevice == AudioSystem::DEVICE_IN_FM_RX_A2DP)
 #else
-        if (inputDevice == android_audio_legacy::AudioSystem::DEVICE_IN_VOICE_CALL)
+        if (inputDevice == AudioSystem::DEVICE_IN_VOICE_CALL)
 #endif
             return NO_ERROR;
 
         if (inputDevice != 0) {
-            if (inputDevice & android_audio_legacy::AudioSystem::DEVICE_IN_BLUETOOTH_SCO_HEADSET) {
+            if (inputDevice & AudioSystem::DEVICE_IN_BLUETOOTH_SCO_HEADSET) {
                 LOGI("Routing audio to Bluetooth PCM");
                 sndDevice = SND_DEVICE_BT;
-            } else if (inputDevice & android_audio_legacy::AudioSystem::DEVICE_IN_WIRED_HEADSET) {
-                if ((outputDevices & android_audio_legacy::AudioSystem::DEVICE_OUT_WIRED_HEADSET) &&
-                    (outputDevices & android_audio_legacy::AudioSystem::DEVICE_OUT_SPEAKER)) {
+            } else if (inputDevice & AudioSystem::DEVICE_IN_WIRED_HEADSET) {
+                if ((outputDevices & AudioSystem::DEVICE_OUT_WIRED_HEADSET) &&
+                    (outputDevices & AudioSystem::DEVICE_OUT_SPEAKER)) {
                     LOGI("Routing audio to Wired Headset and Speaker");
                     sndDevice = SND_DEVICE_HEADSET_AND_SPEAKER;
                 } else {
@@ -1949,10 +1949,10 @@ status_t AudioHardware::doRouting(AudioStreamInMSM72xx *input) {
                     sndDevice = SND_DEVICE_HEADSET;
                 }
             } else {
-                if (outputDevices & android_audio_legacy::AudioSystem::DEVICE_OUT_SPEAKER) {
+                if (outputDevices & AudioSystem::DEVICE_OUT_SPEAKER) {
                     LOGI("Routing audio to Speakerphone");
                     sndDevice = SND_DEVICE_SPEAKER;
-                } else if (outputDevices == android_audio_legacy::AudioSystem::DEVICE_OUT_WIRED_HEADPHONE) {
+                } else if (outputDevices == AudioSystem::DEVICE_OUT_WIRED_HEADPHONE) {
                     LOGI("Routing audio to Speakerphone");
                     sndDevice = SND_DEVICE_NO_MIC_HEADSET;
                 } else {
@@ -1966,13 +1966,13 @@ status_t AudioHardware::doRouting(AudioStreamInMSM72xx *input) {
 
     if (sndDevice == INVALID_DEVICE) {
         if (outputDevices & (outputDevices - 1)) {
-            if ((outputDevices & android_audio_legacy::AudioSystem::DEVICE_OUT_SPEAKER) == 0) {
+            if ((outputDevices & AudioSystem::DEVICE_OUT_SPEAKER) == 0) {
                 LOGW("Hardware does not support requested route combination (%#X),"
                      " picking closest possible route...", outputDevices);
             }
         }
-        if ((mTtyMode != TTY_OFF) && (mMode == android_audio_legacy::AudioSystem::MODE_IN_CALL) &&
-                (outputDevices & android_audio_legacy::AudioSystem::DEVICE_OUT_WIRED_HEADSET)) {
+        if ((mTtyMode != TTY_OFF) && (mMode == AudioSystem::MODE_IN_CALL) &&
+                (outputDevices & AudioSystem::DEVICE_OUT_WIRED_HEADSET)) {
             if (mTtyMode == TTY_FULL) {
                 LOGI("Routing audio to TTY FULL Mode");
                 sndDevice = SND_DEVICE_TTY_FULL;
@@ -1984,29 +1984,29 @@ status_t AudioHardware::doRouting(AudioStreamInMSM72xx *input) {
                 sndDevice = SND_DEVICE_TTY_HCO;
             }
         } else if (outputDevices &
-                   (android_audio_legacy::AudioSystem::DEVICE_OUT_BLUETOOTH_SCO | android_audio_legacy::AudioSystem::DEVICE_OUT_BLUETOOTH_SCO_HEADSET)) {
+                   (AudioSystem::DEVICE_OUT_BLUETOOTH_SCO | AudioSystem::DEVICE_OUT_BLUETOOTH_SCO_HEADSET)) {
             LOGI("Routing audio to Bluetooth PCM");
             sndDevice = SND_DEVICE_BT;
-        } else if (outputDevices & android_audio_legacy::AudioSystem::DEVICE_OUT_BLUETOOTH_SCO_CARKIT) {
+        } else if (outputDevices & AudioSystem::DEVICE_OUT_BLUETOOTH_SCO_CARKIT) {
             LOGI("Routing audio to Bluetooth PCM");
             sndDevice = SND_DEVICE_CARKIT;
 
 /* No framework support
-        } else if (outputDevices & android_audio_legacy::AudioSystem::DEVICE_OUT_AUX_HDMI) {
+        } else if (outputDevices & AudioSystem::DEVICE_OUT_AUX_HDMI) {
             LOGI("Routing audio to HDMI");
             sndDevice = SND_DEVICE_HDMI;
 */
-        } else if ((outputDevices & android_audio_legacy::AudioSystem::DEVICE_OUT_WIRED_HEADSET) &&
-                   (outputDevices & android_audio_legacy::AudioSystem::DEVICE_OUT_SPEAKER)) {
+        } else if ((outputDevices & AudioSystem::DEVICE_OUT_WIRED_HEADSET) &&
+                   (outputDevices & AudioSystem::DEVICE_OUT_SPEAKER)) {
             LOGI("Routing audio to Wired Headset and Speaker");
             sndDevice = SND_DEVICE_HEADSET_AND_SPEAKER;
-        } else if (outputDevices & android_audio_legacy::AudioSystem::DEVICE_OUT_WIRED_HEADPHONE) {
-            if (outputDevices & android_audio_legacy::AudioSystem::DEVICE_OUT_SPEAKER) {
+        } else if (outputDevices & AudioSystem::DEVICE_OUT_WIRED_HEADPHONE) {
+            if (outputDevices & AudioSystem::DEVICE_OUT_SPEAKER) {
                 LOGI("Routing audio to No microphone Wired Headset and Speaker (%d,%d)", mMode, outputDevices);
                 sndDevice = SND_DEVICE_HEADPHONE_AND_SPEAKER;
             } else {
 #ifdef HAVE_FM_RADIO
-                if (outputDevices & android_audio_legacy::AudioSystem::DEVICE_OUT_FM) {
+                if (outputDevices & AudioSystem::DEVICE_OUT_FM) {
                     LOGI("Routing FM audio to No microphone Wired Headset (%d,%d)", mMode, outputDevices);
                     sndDevice = SND_DEVICE_FM_HEADSET;
                 } else {
@@ -2018,9 +2018,9 @@ status_t AudioHardware::doRouting(AudioStreamInMSM72xx *input) {
                 sndDevice = SND_DEVICE_NO_MIC_HEADSET;
 #endif
             }
-        } else if (outputDevices & android_audio_legacy::AudioSystem::DEVICE_OUT_WIRED_HEADSET) {
+        } else if (outputDevices & AudioSystem::DEVICE_OUT_WIRED_HEADSET) {
 #ifdef HAVE_FM_RADIO
-            if (outputDevices & android_audio_legacy::AudioSystem::DEVICE_OUT_FM) {
+            if (outputDevices & AudioSystem::DEVICE_OUT_FM) {
                 LOGI("Routing FM audio to Wired Headset");
                 sndDevice = SND_DEVICE_FM_HEADSET;
             } else {
@@ -2031,9 +2031,9 @@ status_t AudioHardware::doRouting(AudioStreamInMSM72xx *input) {
             LOGI("Routing audio to Wired Headset");
             sndDevice = SND_DEVICE_HEADSET;
 #endif
-        } else if (outputDevices & android_audio_legacy::AudioSystem::DEVICE_OUT_SPEAKER) {
+        } else if (outputDevices & AudioSystem::DEVICE_OUT_SPEAKER) {
 #ifdef HAVE_FM_RADIO
-            if (outputDevices & android_audio_legacy::AudioSystem::DEVICE_OUT_FM) {
+            if (outputDevices & AudioSystem::DEVICE_OUT_FM) {
                 LOGI("Routing FM audio to Speakerphone");
                 sndDevice = SND_DEVICE_FM_SPEAKER;
             } else {
@@ -2050,7 +2050,7 @@ status_t AudioHardware::doRouting(AudioStreamInMSM72xx *input) {
         }
     }
 
-    if (mDualMicEnabled && mMode == android_audio_legacy::AudioSystem::MODE_IN_CALL) {
+    if (mDualMicEnabled && mMode == AudioSystem::MODE_IN_CALL) {
         if (sndDevice == SND_DEVICE_HANDSET) {
             LOGI("Routing audio to handset with DualMike enabled");
             sndDevice = SND_DEVICE_IN_S_SADC_OUT_HANDSET;
@@ -2064,7 +2064,7 @@ status_t AudioHardware::doRouting(AudioStreamInMSM72xx *input) {
     if (sndDevice != INVALID_DEVICE && sndDevice != mCurSndDevice) {
         ret = doAudioRouteOrMute(sndDevice);
         mCurSndDevice = sndDevice;
-        if (mMode == android_audio_legacy::AudioSystem::MODE_IN_CALL) {
+        if (mMode == AudioSystem::MODE_IN_CALL) {
             if (mHACSetting && hac_enable && mCurSndDevice == SND_DEVICE_HAC) {
                 LOGD("HAC enable: Setting in-call volume to maximum.");
                 if (msm_set_voice_rx_vol(VOICE_VOLUME_MAX))
@@ -2077,7 +2077,7 @@ status_t AudioHardware::doRouting(AudioStreamInMSM72xx *input) {
     }
 
 #ifdef HAVE_FM_RADIO
-    if (outputDevices & android_audio_legacy::AudioSystem::DEVICE_OUT_FM)
+    if (outputDevices & AudioSystem::DEVICE_OUT_FM)
         enableFM(sndDevice);
     else
         disableFM();
@@ -2137,7 +2137,7 @@ status_t AudioHardware::disableFM() {
 
 status_t AudioHardware::checkMicMute() {
     Mutex::Autolock lock(mLock);
-    if (mMode != android_audio_legacy::AudioSystem::MODE_IN_CALL)
+    if (mMode != AudioSystem::MODE_IN_CALL)
         setMicMute_nosync(true);
 
     return NO_ERROR;
@@ -2251,8 +2251,8 @@ bool AudioHardware::AudioSessionOutMSM7xxx::checkStandby() {
 }
 
 status_t AudioHardware::AudioSessionOutMSM7xxx::setParameters(const String8& keyValuePairs) {
-    AudioParameter param = AudioParameter(keyValuePairs);
-    String8 key = String8(AudioParameter::keyRouting);
+    android::AudioParameter param = android::AudioParameter(keyValuePairs);
+    String8 key = String8(android::AudioParameter::keyRouting);
     status_t status = NO_ERROR;
     int device;
     LOGV("AudioSessionOutMSM7xxx::setParameters() %s", keyValuePairs.string());
@@ -2271,9 +2271,9 @@ status_t AudioHardware::AudioSessionOutMSM7xxx::setParameters(const String8& key
 }
 
 String8 AudioHardware::AudioSessionOutMSM7xxx::getParameters(const String8& keys) {
-    AudioParameter param = AudioParameter(keys);
+    android::AudioParameter param = android::AudioParameter(keys);
     String8 value;
-    String8 key = String8(AudioParameter::keyRouting);
+    String8 key = String8(android::AudioParameter::keyRouting);
 
     if (param.get(key, value) == NO_ERROR) {
         LOGV("get routing 0x%x", mDevices);
@@ -2384,7 +2384,7 @@ ssize_t AudioHardware::AudioStreamOutMSM72xx::write(const void* buffer, size_t b
         }
 
         LOGV("set config");
-        config.channel_count = android_audio_legacy::AudioSystem::popCount(channels());
+        config.channel_count = AudioSystem::popCount(channels());
         config.sample_rate = sampleRate();
         config.buffer_size = bufferSize();
         config.buffer_count = AUDIO_HW_NUM_OUT_BUF;
@@ -2542,8 +2542,8 @@ bool AudioHardware::AudioStreamOutMSM72xx::checkStandby() {
 }
 
 status_t AudioHardware::AudioStreamOutMSM72xx::setParameters(const String8& keyValuePairs) {
-    AudioParameter param = AudioParameter(keyValuePairs);
-    String8 key = String8(AudioParameter::keyRouting);
+    android::AudioParameter param = android::AudioParameter(keyValuePairs);
+    String8 key = String8(android::AudioParameter::keyRouting);
     status_t status = NO_ERROR;
     int device;
     LOGV("AudioStreamOutMSM72xx::setParameters() %s", keyValuePairs.string());
@@ -2562,9 +2562,9 @@ status_t AudioHardware::AudioStreamOutMSM72xx::setParameters(const String8& keyV
 }
 
 String8 AudioHardware::AudioStreamOutMSM72xx::getParameters(const String8& keys) {
-    AudioParameter param = AudioParameter(keys);
+    android::AudioParameter param = android::AudioParameter(keys);
     String8 value;
-    String8 key = String8(AudioParameter::keyRouting);
+    String8 key = String8(android::AudioParameter::keyRouting);
 
     if (param.get(key, value) == NO_ERROR) {
         LOGV("get routing 0x%x", mDevices);
@@ -2586,25 +2586,25 @@ AudioHardware::AudioStreamInMSM72xx::AudioStreamInMSM72xx() :
     mHardware(0), mFd(-1), mState(AUDIO_INPUT_CLOSED), mRetryCount(0),
     mFormat(AUDIO_HW_IN_FORMAT), mChannels(AUDIO_HW_IN_CHANNELS),
     mSampleRate(AUDIO_HW_IN_SAMPLERATE), mBufferSize(AUDIO_HW_IN_BUFFERSIZE),
-    mAcoustics((android_audio_legacy::AudioSystem::audio_in_acoustics)0), mDevices(0) {
+    mAcoustics((AudioSystem::audio_in_acoustics)0), mDevices(0) {
 }
 
 status_t AudioHardware::AudioStreamInMSM72xx::set(
         AudioHardware* hw, uint32_t devices, int *pFormat, uint32_t *pChannels, uint32_t *pRate,
-        android_audio_legacy::AudioSystem::audio_in_acoustics acoustic_flags) {
+        AudioSystem::audio_in_acoustics acoustic_flags) {
     if ((pFormat == 0) ||
        ((*pFormat != AUDIO_HW_IN_FORMAT) &&
 #ifdef WITH_QCOM_SPEECH
-        (*pFormat != android_audio_legacy::AudioSystem::AMR_NB) &&
-        (*pFormat != android_audio_legacy::AudioSystem::EVRC) &&
-        (*pFormat != android_audio_legacy::AudioSystem::QCELP) &&
+        (*pFormat != AudioSystem::AMR_NB) &&
+        (*pFormat != AudioSystem::EVRC) &&
+        (*pFormat != AudioSystem::QCELP) &&
 #endif
-         (*pFormat != android_audio_legacy::AudioSystem::AAC)))     {
+         (*pFormat != AudioSystem::AAC)))     {
         *pFormat = AUDIO_HW_IN_FORMAT;
         return BAD_VALUE;
     }
 
-    if ((*pFormat == android_audio_legacy::AudioSystem::AAC) && (*pChannels & (android_audio_legacy::AudioSystem::CHANNEL_IN_VOICE_DNLINK | android_audio_legacy::AudioSystem::CHANNEL_IN_VOICE_UPLINK))) {
+    if ((*pFormat == AudioSystem::AAC) && (*pChannels & (AudioSystem::CHANNEL_IN_VOICE_DNLINK | AudioSystem::CHANNEL_IN_VOICE_UPLINK))) {
         LOGE("voice call recording in AAC format does not support");
         return BAD_VALUE;
     }
@@ -2618,7 +2618,7 @@ status_t AudioHardware::AudioStreamInMSM72xx::set(
         return BAD_VALUE;
     }
 
-    if (pChannels == 0 || (*pChannels & (android_audio_legacy::AudioSystem::CHANNEL_IN_MONO | android_audio_legacy::AudioSystem::CHANNEL_IN_STEREO)) == 0) {
+    if (pChannels == 0 || (*pChannels & (AudioSystem::CHANNEL_IN_MONO | AudioSystem::CHANNEL_IN_STEREO)) == 0) {
         *pChannels = AUDIO_HW_IN_CHANNELS;
         return BAD_VALUE;
     }
@@ -2633,7 +2633,7 @@ status_t AudioHardware::AudioStreamInMSM72xx::set(
     status_t status = 0;
     struct msm_voicerec_mode voc_rec_cfg;
 #ifdef HAVE_FM_RADIO
-    if (devices == android_audio_legacy::AudioSystem::DEVICE_IN_FM_RX_A2DP) {
+    if (devices == AudioSystem::DEVICE_IN_FM_RX_A2DP) {
         status = ::open("/dev/msm_a2dp_in", O_RDONLY);
         if (status < 0) {
             LOGE("Cannot open /dev/msm_a2dp_in errno: %d", errno);
@@ -2650,7 +2650,7 @@ status_t AudioHardware::AudioStreamInMSM72xx::set(
         }
 
         LOGV("set config");
-        config.channel_count = android_audio_legacy::AudioSystem::popCount((*pChannels) & (android_audio_legacy::AudioSystem::CHANNEL_IN_STEREO | android_audio_legacy::AudioSystem::CHANNEL_IN_MONO));
+        config.channel_count = AudioSystem::popCount((*pChannels) & (AudioSystem::CHANNEL_IN_STEREO | AudioSystem::CHANNEL_IN_MONO));
         config.sample_rate = *pRate;
         config.buffer_size = bufferSize();
         config.buffer_count = 2;
@@ -2660,9 +2660,9 @@ status_t AudioHardware::AudioStreamInMSM72xx::set(
             LOGE("Cannot set config");
             if (ioctl(mFd, AUDIO_GET_CONFIG, &config) == 0) {
                 if (config.channel_count == 1)
-                    *pChannels = android_audio_legacy::AudioSystem::CHANNEL_IN_MONO;
+                    *pChannels = AudioSystem::CHANNEL_IN_MONO;
                 else
-                    *pChannels = android_audio_legacy::AudioSystem::CHANNEL_IN_STEREO;
+                    *pChannels = AudioSystem::CHANNEL_IN_STEREO;
 
                 *pRate = config.sample_rate;
             }
@@ -2707,7 +2707,7 @@ status_t AudioHardware::AudioStreamInMSM72xx::set(
         }
 
         LOGV("set config");
-        config.channel_count = android_audio_legacy::AudioSystem::popCount((*pChannels) & (android_audio_legacy::AudioSystem::CHANNEL_IN_STEREO | android_audio_legacy::AudioSystem::CHANNEL_IN_MONO));
+        config.channel_count = AudioSystem::popCount((*pChannels) & (AudioSystem::CHANNEL_IN_STEREO | AudioSystem::CHANNEL_IN_MONO));
         config.sample_rate = *pRate;
         config.buffer_size = bufferSize();
         config.buffer_count = 2;
@@ -2717,9 +2717,9 @@ status_t AudioHardware::AudioStreamInMSM72xx::set(
             LOGE("Cannot set config");
             if (ioctl(mFd, AUDIO_GET_CONFIG, &config) == 0) {
                 if (config.channel_count == 1)
-                    *pChannels = android_audio_legacy::AudioSystem::CHANNEL_IN_MONO;
+                    *pChannels = AudioSystem::CHANNEL_IN_MONO;
                 else
-                    *pChannels = android_audio_legacy::AudioSystem::CHANNEL_IN_STEREO;
+                    *pChannels = AudioSystem::CHANNEL_IN_STEREO;
 
                 *pRate = config.sample_rate;
             }
@@ -2740,15 +2740,15 @@ status_t AudioHardware::AudioStreamInMSM72xx::set(
         mDevices = devices;
         mFormat = AUDIO_HW_IN_FORMAT;
         mChannels = *pChannels;
-        if (mDevices == android_audio_legacy::AudioSystem::DEVICE_IN_VOICE_CALL) {
-            if ((mChannels & android_audio_legacy::AudioSystem::CHANNEL_IN_VOICE_DNLINK) &&
-                (mChannels & android_audio_legacy::AudioSystem::CHANNEL_IN_VOICE_UPLINK)) {
+        if (mDevices == AudioSystem::DEVICE_IN_VOICE_CALL) {
+            if ((mChannels & AudioSystem::CHANNEL_IN_VOICE_DNLINK) &&
+                (mChannels & AudioSystem::CHANNEL_IN_VOICE_UPLINK)) {
                  LOGI("Recording Source: Voice Call Both Uplink and Downlink");
                  voc_rec_cfg.rec_mode = VOC_REC_BOTH;
-            } else if (mChannels & android_audio_legacy::AudioSystem::CHANNEL_IN_VOICE_DNLINK) {
+            } else if (mChannels & AudioSystem::CHANNEL_IN_VOICE_DNLINK) {
                  LOGI("Recording Source: Voice Call DownLink");
                  voc_rec_cfg.rec_mode = VOC_REC_DOWNLINK;
-            } else if (mChannels & android_audio_legacy::AudioSystem::CHANNEL_IN_VOICE_UPLINK) {
+            } else if (mChannels & AudioSystem::CHANNEL_IN_VOICE_UPLINK) {
                  LOGI("Recording Source: Voice Call UpLink");
                  voc_rec_cfg.rec_mode = VOC_REC_UPLINK;
             }
@@ -2761,7 +2761,7 @@ status_t AudioHardware::AudioStreamInMSM72xx::set(
         mBufferSize = config.buffer_size;
     }
 #ifdef WITH_QCOM_SPEECH
-    else if (*pFormat == android_audio_legacy::AudioSystem::EVRC) {
+    else if (*pFormat == AudioSystem::EVRC) {
         LOGI("Recording format: EVRC");
         /* open evrc input device */
         status = ::open(EVRC_DEVICE_IN, O_RDONLY);
@@ -2773,15 +2773,15 @@ status_t AudioHardware::AudioStreamInMSM72xx::set(
         mDevices = devices;
         mChannels = *pChannels;
 
-        if (mDevices == android_audio_legacy::AudioSystem::DEVICE_IN_VOICE_CALL) {
-            if ((mChannels & android_audio_legacy::AudioSystem::CHANNEL_IN_VOICE_DNLINK) &&
-                (mChannels & android_audio_legacy::AudioSystem::CHANNEL_IN_VOICE_UPLINK)) {
+        if (mDevices == AudioSystem::DEVICE_IN_VOICE_CALL) {
+            if ((mChannels & AudioSystem::CHANNEL_IN_VOICE_DNLINK) &&
+                (mChannels & AudioSystem::CHANNEL_IN_VOICE_UPLINK)) {
                 LOGI("Recording Source: Voice Call Both Uplink and Downlink");
                 voc_rec_cfg.rec_mode = VOC_REC_BOTH;
-            } else if (mChannels & android_audio_legacy::AudioSystem::CHANNEL_IN_VOICE_DNLINK) {
+            } else if (mChannels & AudioSystem::CHANNEL_IN_VOICE_DNLINK) {
                 LOGI("Recording Source: Voice Call DownLink");
                 voc_rec_cfg.rec_mode = VOC_REC_DOWNLINK;
-            } else if (mChannels & android_audio_legacy::AudioSystem::CHANNEL_IN_VOICE_UPLINK) {
+            } else if (mChannels & AudioSystem::CHANNEL_IN_VOICE_UPLINK) {
                 LOGI("Recording Source: Voice Call UpLink");
                 voc_rec_cfg.rec_mode = VOC_REC_UPLINK;
             }
@@ -2823,7 +2823,7 @@ status_t AudioHardware::AudioStreamInMSM72xx::set(
             LOGE("Error: AUDIO_SET_EVRC_ENC_CONFIG failed");
             goto Error;
         }
-    } else if (*pFormat == android_audio_legacy::AudioSystem::QCELP) {
+    } else if (*pFormat == AudioSystem::QCELP) {
         LOGI("Recording format: QCELP");
         /* open qcelp input device */
         status = ::open(QCELP_DEVICE_IN, O_RDONLY);
@@ -2835,15 +2835,15 @@ status_t AudioHardware::AudioStreamInMSM72xx::set(
         mDevices = devices;
         mChannels = *pChannels;
 
-        if (mDevices == android_audio_legacy::AudioSystem::DEVICE_IN_VOICE_CALL) {
-            if ((mChannels & android_audio_legacy::AudioSystem::CHANNEL_IN_VOICE_DNLINK) &&
-                (mChannels & android_audio_legacy::AudioSystem::CHANNEL_IN_VOICE_UPLINK)) {
+        if (mDevices == AudioSystem::DEVICE_IN_VOICE_CALL) {
+            if ((mChannels & AudioSystem::CHANNEL_IN_VOICE_DNLINK) &&
+                (mChannels & AudioSystem::CHANNEL_IN_VOICE_UPLINK)) {
                 LOGI("Recording Source: Voice Call Both Uplink and Downlink");
                 voc_rec_cfg.rec_mode = VOC_REC_BOTH;
-            } else if (mChannels & android_audio_legacy::AudioSystem::CHANNEL_IN_VOICE_DNLINK) {
+            } else if (mChannels & AudioSystem::CHANNEL_IN_VOICE_DNLINK) {
                 LOGI("Recording Source: Voice Call DownLink");
                 voc_rec_cfg.rec_mode = VOC_REC_DOWNLINK;
-            } else if (mChannels & android_audio_legacy::AudioSystem::CHANNEL_IN_VOICE_UPLINK) {
+            } else if (mChannels & AudioSystem::CHANNEL_IN_VOICE_UPLINK) {
                 LOGI("Recording Source: Voice Call UpLink");
                 voc_rec_cfg.rec_mode = VOC_REC_UPLINK;
             }
@@ -2886,7 +2886,7 @@ status_t AudioHardware::AudioStreamInMSM72xx::set(
             LOGE("Error: AUDIO_SET_QCELP_ENC_CONFIG failed");
             goto Error;
         }
-    } else if (*pFormat == android_audio_legacy::AudioSystem::AMR_NB) {
+    } else if (*pFormat == AudioSystem::AMR_NB) {
         LOGI("Recording format: AMR_NB");
         /* open amr_nb input device */
         status = ::open(AMRNB_DEVICE_IN, O_RDONLY);
@@ -2898,15 +2898,15 @@ status_t AudioHardware::AudioStreamInMSM72xx::set(
         mDevices = devices;
         mChannels = *pChannels;
 
-        if (mDevices == android_audio_legacy::AudioSystem::DEVICE_IN_VOICE_CALL) {
-            if ((mChannels & android_audio_legacy::AudioSystem::CHANNEL_IN_VOICE_DNLINK) &&
-                (mChannels & android_audio_legacy::AudioSystem::CHANNEL_IN_VOICE_UPLINK)) {
+        if (mDevices == AudioSystem::DEVICE_IN_VOICE_CALL) {
+            if ((mChannels & AudioSystem::CHANNEL_IN_VOICE_DNLINK) &&
+                (mChannels & AudioSystem::CHANNEL_IN_VOICE_UPLINK)) {
                 LOGI("Recording Source: Voice Call Both Uplink and Downlink");
                 voc_rec_cfg.rec_mode = VOC_REC_BOTH;
-            } else if (mChannels & android_audio_legacy::AudioSystem::CHANNEL_IN_VOICE_DNLINK) {
+            } else if (mChannels & AudioSystem::CHANNEL_IN_VOICE_DNLINK) {
                 LOGI("Recording Source: Voice Call DownLink");
                 voc_rec_cfg.rec_mode = VOC_REC_DOWNLINK;
-            } else if (mChannels & android_audio_legacy::AudioSystem::CHANNEL_IN_VOICE_UPLINK) {
+            } else if (mChannels & AudioSystem::CHANNEL_IN_VOICE_UPLINK) {
                 LOGI("Recording Source: Voice Call UpLink");
                 voc_rec_cfg.rec_mode = VOC_REC_UPLINK;
             }
@@ -2951,7 +2951,7 @@ status_t AudioHardware::AudioStreamInMSM72xx::set(
         }
     }
 #endif
-    else if (*pFormat == android_audio_legacy::AudioSystem::AAC) {
+    else if (*pFormat == AudioSystem::AAC) {
         LOGI("Recording format: AAC");
         /* open aac input device */
         status = ::open(AAC_DEVICE_IN, O_RDWR);
@@ -2986,9 +2986,9 @@ status_t AudioHardware::AudioStreamInMSM72xx::set(
         aac_enc_cfg.sample_rate = mSampleRate = *pRate;
         mFormat = *pFormat;
         mBufferSize = 2048;
-        if (*pChannels & (android_audio_legacy::AudioSystem::CHANNEL_IN_MONO))
+        if (*pChannels & (AudioSystem::CHANNEL_IN_MONO))
             aac_enc_cfg.channels = 1;
-        else if (*pChannels & (android_audio_legacy::AudioSystem::CHANNEL_IN_STEREO))
+        else if (*pChannels & (AudioSystem::CHANNEL_IN_STEREO))
             aac_enc_cfg.channels = 2;
 
         aac_enc_cfg.bit_rate = 128000;
@@ -3043,8 +3043,8 @@ ssize_t AudioHardware::AudioStreamInMSM72xx::read( void* buffer, ssize_t bytes) 
             return -1;
         }
 #ifdef HAVE_FM_RADIO
-        if ((mDevices == android_audio_legacy::AudioSystem::DEVICE_IN_FM_RX) ||
-            (mDevices == android_audio_legacy::AudioSystem::DEVICE_IN_FM_RX_A2DP)) {
+        if ((mDevices == AudioSystem::DEVICE_IN_FM_RX) ||
+            (mDevices == AudioSystem::DEVICE_IN_FM_RX_A2DP)) {
 /*
             if (ioctl(mFd, AUDIO_GET_SESSION_ID, &dec_id)) {
                 LOGE("AUDIO_GET_SESSION_ID failed*********");
@@ -3064,7 +3064,7 @@ ssize_t AudioHardware::AudioStreamInMSM72xx::read( void* buffer, ssize_t bytes) 
                 return -1;
             }
             mFirstread = false;
-            if (mDevices == android_audio_legacy::AudioSystem::DEVICE_IN_FM_RX_A2DP) {
+            if (mDevices == AudioSystem::DEVICE_IN_FM_RX_A2DP) {
                 addToTable(dec_id,cur_tx,INVALID_DEVICE,FM_A2DP,true);
                 mFmRec = FM_A2DP_REC;
             }
@@ -3149,14 +3149,14 @@ ssize_t AudioHardware::AudioStreamInMSM72xx::read( void* buffer, ssize_t bytes) 
         }
     }
 #ifdef WITH_QCOM_SPEECH
-    else if ((mFormat == android_audio_legacy::AudioSystem::EVRC) || (mFormat == android_audio_legacy::AudioSystem::QCELP) || (mFormat == android_audio_legacy::AudioSystem::AMR_NB)) {
+    else if ((mFormat == AudioSystem::EVRC) || (mFormat == AudioSystem::QCELP) || (mFormat == AudioSystem::AMR_NB)) {
         uint8_t readBuf[36];
         uint8_t *dataPtr;
         while (count) {
             dataPtr = readBuf;
             ssize_t bytesRead = ::read(mFd, readBuf, 36);
             if (bytesRead >= 0) {
-                if (mFormat == android_audio_legacy::AudioSystem::AMR_NB) {
+                if (mFormat == AudioSystem::AMR_NB) {
                     amr_transcode(dataPtr,p);
                     p += AMRNB_FRAME_SIZE;
                     count -= AMRNB_FRAME_SIZE;
@@ -3167,7 +3167,7 @@ ssize_t AudioHardware::AudioStreamInMSM72xx::read( void* buffer, ssize_t bytes) 
                     }
                 } else {
                     dataPtr++;
-                    if (mFormat == android_audio_legacy::AudioSystem::EVRC) {
+                    if (mFormat == AudioSystem::EVRC) {
                         memcpy(p, dataPtr, EVRC_FRAME_SIZE);
                         p += EVRC_FRAME_SIZE;
                         count -= EVRC_FRAME_SIZE;
@@ -3176,7 +3176,7 @@ ssize_t AudioHardware::AudioStreamInMSM72xx::read( void* buffer, ssize_t bytes) 
                             mFirstread = true;
                             break;
                         }
-                    } else if (mFormat == android_audio_legacy::AudioSystem::QCELP) {
+                    } else if (mFormat == AudioSystem::QCELP) {
                         memcpy(p, dataPtr, QCELP_FRAME_SIZE);
                         p += QCELP_FRAME_SIZE;
                         count -= QCELP_FRAME_SIZE;
@@ -3197,7 +3197,7 @@ ssize_t AudioHardware::AudioStreamInMSM72xx::read( void* buffer, ssize_t bytes) 
         }
     }
 #endif
-    else if (mFormat == android_audio_legacy::AudioSystem::AAC) {
+    else if (mFormat == AudioSystem::AAC) {
         *((uint32_t*)recogPtr) = 0x51434F4D ; /* ('Q','C','O','M') Number to identify format as AAC by higher layers */
         recogPtr++;
         frameCountPtr = (uint16_t*)recogPtr;
@@ -3247,7 +3247,7 @@ ssize_t AudioHardware::AudioStreamInMSM72xx::read( void* buffer, ssize_t bytes) 
         }
     }
 
-    if (mFormat == android_audio_legacy::AudioSystem::AAC)
+    if (mFormat == AudioSystem::AAC)
         return aac_framesize;
 
     return bytes;
@@ -3327,14 +3327,14 @@ status_t AudioHardware::AudioStreamInMSM72xx::dump(int fd, const Vector<String16
 }
 
 status_t AudioHardware::AudioStreamInMSM72xx::setParameters(const String8& keyValuePairs) {
-    AudioParameter param = AudioParameter(keyValuePairs);
+    android::AudioParameter param = android::AudioParameter(keyValuePairs);
     status_t status = NO_ERROR;
     int device;
-    String8 key = String8(AudioParameter::keyInputSource);
+    String8 key = String8(android::AudioParameter::keyInputSource);
     int source;
     LOGV("AudioStreamInMSM72xx::setParameters() %s", keyValuePairs.string());
 
-    key = String8(AudioParameter::keyRouting);
+    key = String8(android::AudioParameter::keyRouting);
     if (param.getInt(key, device) == NO_ERROR) {
         LOGV("set input routing 0x%x", device);
         if (device & (device - 1))
@@ -3353,9 +3353,9 @@ status_t AudioHardware::AudioStreamInMSM72xx::setParameters(const String8& keyVa
 }
 
 String8 AudioHardware::AudioStreamInMSM72xx::getParameters(const String8& keys) {
-    AudioParameter param = AudioParameter(keys);
+    android::AudioParameter param = android::AudioParameter(keys);
     String8 value;
-    String8 key = String8(AudioParameter::keyRouting);
+    String8 key = String8(android::AudioParameter::keyRouting);
 
     if (param.get(key, value) == NO_ERROR) {
         LOGV("get routing 0x%x", mDevices);

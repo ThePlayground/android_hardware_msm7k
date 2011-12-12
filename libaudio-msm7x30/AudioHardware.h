@@ -28,7 +28,7 @@
 #include <hardware_legacy/AudioHardwareBase.h>
 
 extern "C" {
-#include <linux/msm_audio_7X30.h>
+#include <linux/msm_audio_7x30.h>
 #include <linux/msm_audio_aac.h>
 #ifdef WITH_QCOM_SPEECH
 #include <linux/msm_audio_qcp.h>
@@ -36,9 +36,9 @@ extern "C" {
 #endif
 }
 
-namespace android {
+using namespace android;
 
-using namespace android_audio_legacy;
+namespace android_audio_legacy {
 
 // ----------------------------------------------------------------------------
 // Kernel driver interface
@@ -87,9 +87,9 @@ enum tty_modes {
 #define AUDIO_HW_OUT_LATENCY_MS 0    /* Additionnal latency introduced by audio DSP and hardware in ms */
 
 #define AUDIO_HW_IN_SAMPLERATE  8000 /* Default audio input sample rate */
-#define AUDIO_HW_IN_CHANNELS    (android_audio_legacy::AudioSystem::CHANNEL_IN_MONO) // Default audio input channel mask */
+#define AUDIO_HW_IN_CHANNELS    (AudioSystem::CHANNEL_IN_MONO) // Default audio input channel mask */
 #define AUDIO_HW_IN_BUFFERSIZE  2048 /* Default audio input buffer size */
-#define AUDIO_HW_IN_FORMAT      (android_audio_legacy::AudioSystem::PCM_16_BIT) // Default audio input sample format */
+#define AUDIO_HW_IN_FORMAT      (AudioSystem::PCM_16_BIT) // Default audio input sample format */
 
 #define VOICE_VOLUME_MAX        100  /* Maximum voice volume */
 
@@ -433,8 +433,8 @@ private:
         virtual unsigned int  getInputFramesLost() const { return 0; }
                 uint32_t    devices() { return mDevices; }
                 int         state() const { return mState; }
-        virtual status_t    addAudioEffect(effect_interface_s**){return INVALID_OPERATION;}
-        virtual status_t    removeAudioEffect(effect_interface_s**){return INVALID_OPERATION;}
+    status_t addAudioEffect(effect_handle_t effect) { return NO_ERROR; };
+    status_t removeAudioEffect(effect_handle_t effect) { return NO_ERROR; };
 
     private:
                 AudioHardware* mHardware;

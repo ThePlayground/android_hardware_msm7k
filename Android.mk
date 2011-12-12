@@ -22,7 +22,7 @@ endif
 ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
 
 common_msm_dirs := liblights $(LIBRPC) dspcrashd
-msm7k_dirs := $(common_msm_dirs) boot
+msm7k_dirs := $(common_msm_dirs) boot libaudio-msm7x30
 
 ifeq ($(TARGET_BOARD_PLATFORM),msm7x27)
   include $(call all-named-subdir-makefiles,$(msm7k_dirs))
