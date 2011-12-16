@@ -14,14 +14,9 @@
 # limitations under the License.
 #
 
-LIBRPC := librpc
-ifeq ($(BOARD_USES_QCOM_LIBRPC),true)
-    LIBRPC := librpc-qcom
-endif
-
 ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
 
-common_msm_dirs := liblights $(LIBRPC)
+common_msm_dirs := liblights librpc
 qsd8k_dirs := $(common_msm_dirs) libaudio-qsd8k dspcrashd libcopybit
 msm7x30_dirs := $(common_msm_dirs) libaudio-msm7x30 liboverlay
 msm7x27a_dirs := $(common_msm_dirs) boot libaudio-msm7x27a dspcrashd
