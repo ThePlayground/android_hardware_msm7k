@@ -45,7 +45,7 @@
 /*****************************************************************************/
 
 // numbers of buffers for page flipping
-#define NUM_BUFFERS 2
+#define NUM_BUFFERS 3
 
 
 enum {
