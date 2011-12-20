@@ -16,18 +16,30 @@
 
 ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
 
-common_msm_dirs := liblights librpc
-qsd8k_dirs := $(common_msm_dirs) dspcrashd libcopybit
-msm7x30_dirs := $(common_msm_dirs) liboverlay
+LIBRPC := librpc
+ifeq ($(BOARD_USES_QCOM_LIBRPC),true)
+    LIBRPC := librpc-qcom
+endif
+
+common_msm_dirs := liblights $(LIBRPC)
+
 msm7x27a_dirs := $(common_msm_dirs) boot dspcrashd
 msm7k_dirs := $(common_msm_dirs) boot libaudio libcopybit dspcrashd
 
+ifneq ($(BOARD_USES_QCOM_LEGACY),true)
+    qsd8k_dirs := $(common_msm_dirs) dspcrashd libcopybit
+    msm7x30_dirs := $(common_msm_dirs) liboverlay
+else
+    qsd8k_dirs := $(common_msm_dirs) libcopybit libaudio-qsd8 dspcrashd libgralloc-qsd8k
+    msm7x30_dirs := $(common_msm_dirs) libcopybit libaudio-msm7x30 liboverlay libgralloc-qsd8k
+endif
+
 ifeq ($(TARGET_BOARD_PLATFORM),msm7x30)
-  include $(call all-named-subdir-makefiles,$(msm7x30_dirs))
+    include $(call all-named-subdir-makefiles,$(msm7x30_dirs))
 endif
 
 ifeq ($(TARGET_BOARD_PLATFORM),qsd8k)
-  include $(call all-named-subdir-makefiles,$(qsd8k_dirs))
+    include $(call all-named-subdir-makefiles,$(qsd8k_dirs))
 endif
 
 ifeq ($(TARGET_BOARD_PLATFORM), msm7x27a)
