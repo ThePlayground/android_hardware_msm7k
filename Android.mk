@@ -33,6 +33,10 @@ endif
 msm7x27a_dirs := $(common_msm_dirs) boot dspcrashd
 msm7k_dirs := $(common_msm_dirs) boot libaudio libcopybit dspcrashd
 
+ifeq ($(BUILD_QCOM_VENDOR),true)
+    include $(call all-named-subdir-makefiles,libstagefrighthw)
+endif
+
 ifeq ($(TARGET_BOARD_PLATFORM),msm7x30)
     include $(call all-named-subdir-makefiles,$(msm7x30_dirs))
 endif
