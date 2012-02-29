@@ -24,7 +24,7 @@ ifneq ($(BOARD_USES_QCOM_LEGACY),true)
 
 else
 
-    common_msm_dirs := liblights libopencorehw libstagefrighthw
+    common_msm_dirs := liblights libopencorehw
     qsd8k_dirs := $(common_msm_dirs) libaudio-qsd8 dspcrashd libcopybit
     msm7x30_dirs := $(common_msm_dirs) libaudio-msm7x30 liboverlay
 
