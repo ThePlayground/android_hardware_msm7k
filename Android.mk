@@ -18,13 +18,13 @@ ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
 
 ifneq ($(BOARD_USES_LEGACY_QCOM),true)
 
-    common_msm_dirs := liblights
+    common_msm_dirs := liblights librpc
     qsd8k_dirs := $(common_msm_dirs) dspcrashd libcopybit
     msm7x30_dirs := $(common_msm_dirs)
 
 else
 
-    common_msm_dirs := liblights
+    common_msm_dirs := liblights librpc
     qsd8k_dirs := $(common_msm_dirs) libaudio-qsd8 dspcrashd libcopybit
     msm7x30_dirs := $(common_msm_dirs) libaudio-msm7x30 libstagefrighthw
 
