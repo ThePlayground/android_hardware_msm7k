@@ -37,6 +37,10 @@ ifeq ($(BUILD_QCOM_VENDOR),true)
     include $(call all-named-subdir-makefiles,libstagefrighthw)
 endif
 
+ifeq ($(TARGET_BOARD_PLATFORM),msm8660)
+    include $(call all-named-subdir-makefiles,$(common_msm_dirs))
+endif
+
 ifeq ($(TARGET_BOARD_PLATFORM),msm7x30)
     include $(call all-named-subdir-makefiles,$(msm7x30_dirs))
 endif
