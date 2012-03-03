@@ -1,5 +1,3 @@
-ifeq ($(BOARD_USES_QCOM_LIBRPC),true)
-
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
@@ -33,5 +31,3 @@ LOCAL_STATIC_LIBRARIES := libpower
 LOCAL_WHOLE_STATIC_LIBRARIES := librpc
 # LOCAL_PRELINK_MODULE := false
 include $(BUILD_SHARED_LIBRARY)
-
-endif
