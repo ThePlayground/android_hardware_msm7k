@@ -24,17 +24,18 @@ ifneq ($(BOARD_USES_LEGACY_QCOM),true)
 
 else
 
-    common_msm_dirs := liblights librpc
+    common_msm_dirs := liblights librpc libstagefrighthw
     qsd8k_dirs := $(common_msm_dirs) libaudio-qsd8 dspcrashd
     msm7x30_dirs := $(common_msm_dirs) libaudio-msm7x30
 
 endif
 
+msm8660_dirs := liblights librpc
 msm7x27a_dirs := $(common_msm_dirs) boot dspcrashd
 msm7k_dirs := $(common_msm_dirs) boot libaudio libcopybit dspcrashd
 
 ifeq ($(TARGET_BOARD_PLATFORM),msm8660)
-    include $(call all-named-subdir-makefiles,$(common_msm_dirs))
+    include $(call all-named-subdir-makefiles,$(msm8660_dirs))
 endif
 
 ifeq ($(TARGET_BOARD_PLATFORM),msm7x30)
